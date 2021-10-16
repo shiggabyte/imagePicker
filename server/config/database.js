@@ -1,7 +1,8 @@
 const { Sequelize } = require('sequelize');
 
-module.exports = new Sequelize('image', 'postgres', 'Mesculentus1100', {
+const db = new Sequelize('image', 'postgres', null, {
     host: 'localhost',
     dialect: 'postgres'
 });
 
+module.exports = db; 

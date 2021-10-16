@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import dataURLtoBlob from 'dataurl-to-blob';
 import { View, Text, TouchableHighlight, Image, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Input, Button, Card, Icon } from 'react-native-elements';
@@ -18,29 +19,55 @@ const HomeScreen = ({ navigation }) => {
             quality: 1,
         });
 
-        console.log(await result);
-
+        console.log(result);
         if (!result.cancelled) {
             setImage(result.uri);
         }
     };
     const submit = async () => {
+        /*
+
+        We get either a <file> object, <dataurl> string or <filepath> string as the
+        selected file from file pickers
+
+        The formdata object entry values are expected to be one of the folowing types
+        - File object
+        - Blob object
+        - Normal object with the following properties
+            name <string>
+            type <string>
+            uri  <filepath>
+
+        Files that are part of formdata are extracted out of the request body
+        and placed under a different request field, usually <file> or <files>
+
+        */
+
+        const data = new FormData();
+
+        const ext = image.startsWith('data:')
+                        ? image.split(':')[1].split('/')[1].split(';')[0]
+                        : image.split('.')[image.split('.').length - 1]
+
+        const file = image.startsWith('data:')
+                        ? dataURLtoBlob(image)
+                        : { uri: image, type: 'image/jpg', name: 'name.' + ext }
+
+        data.append('image', file, 'name.' + ext);
 
         //const body = { todo };
-        const data = new FormData();
+        //const data = new FormData();
         /*data.append('name', product);
         data.append('price', price);
         data.append('description', desc);*/
-        data.append('image', {
-            uri: image,
-            type: 'image/jpg',
-            name: 'name.jpg'
-        });
+        // data.append('image', {
+        //     uri: image,
+        //     type: 'image/jpg',
+        //     name: 'name.jpg'
+        // });
 
-
-        axios.post("http://192.168.43.99:5000/Products/upload", data, {
+        axios.post("http://localhost:5000/Products/upload", data, {
             headers: {
-                Accept: 'application/json',
                 'Content-Type': 'multipart/form-data',
             }
         }).then(response => {
