@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         const fileName = file.originalname.toLowerCase().split(' ').join('-');
-        cb(null, 'jfhfjjduu' + '-' + fileName)
+        cb(null, fileName)
     }
 });
 
@@ -34,7 +34,6 @@ router.get('/', (req, res) => {
     res.send(response);
 });
 router.post('/upload', upload.single('image'), (req, res, next) => {
-    console.log(req.body);
     try {
         console.log(req.file) // Here you will get the file 
         return res.status(200).send('Done');
