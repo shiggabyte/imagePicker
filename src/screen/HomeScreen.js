@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import dataURLToBlob from 'dataurl-to-blob';
 import { View, Text, TouchableHighlight, Image, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Input, Button, Card, Icon } from 'react-native-elements';
@@ -18,27 +19,40 @@ const HomeScreen = ({ navigation }) => {
             quality: 1,
         });
 
-        console.log(await result);
+        console.log(result);
 
         if (!result.cancelled) {
             setImage(result.uri);
         }
     };
     const submit = async () => {
+        console.log(image);
+        // Mobile : Filepath <string>
+        // Web : Data URL <string>
+        // File Obj | Blob Obj | Normal Obj with File object properties
+
+        const data = new FormData();
+
+        const value = image.startsWith('data:')
+            ? dataURLToBlob(image)
+            : { uri: image, type: 'image/jpeg', name: 'name.jpg' }
+
+        value.name = 'our-name.jpg';
+
+        data.append('image', value);
 
         //const body = { todo };
-        const data = new FormData();
+        // const data = new FormData();
         /*data.append('name', product);
         data.append('price', price);
         data.append('description', desc);*/
-        data.append('image', {
-            uri: image,
-            type: 'image/jpg',
-            name: 'name.jpg'
-        });
+        // data.append('image', {
+        //     uri: image,
+        //     type: 'image/jpg',
+        //     name: 'name.jpg'
+        // });
 
-
-        axios.post("http://192.168.43.99:5000/Products/upload", data, {
+        axios.post("http://localhost:5000/Products/upload", data, {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'multipart/form-data',
